@@ -29,11 +29,18 @@ const val LOG_ROUTE = "direct:log"
 class SearchController(private val producerTemplate: ProducerTemplate) {
     @RequestMapping("/")
     fun index() = "index"
-
+    
     @RequestMapping(value = ["/search"])
     @ResponseBody
-    fun search(@RequestParam("q") q: String?): Any =
-        producerTemplate.requestBodyAndHeader(DIRECT_ROUTE, "mandalorian", "keywords", q)
+fun search(@RequestParam("q") q: String?): Any {
+    val k = if (q!!.contains("max:", ignoreCase = true)) q.replace(" max:", "?count=") else q
+    return producerTemplate.requestBodyAndHeader(DIRECT_ROUTE,
+    "mandalorian",
+    "keywords",
+    k
+    )
+ } 
+    
 }
 
 @Component
@@ -72,4 +79,3 @@ class TaggedCounter(private val name: String, private val tagName: String, priva
         }.increment()
     }
 }
-
